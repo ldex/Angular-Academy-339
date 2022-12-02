@@ -9,12 +9,20 @@ import { Observable, throwError, catchError, delay, shareReplay, tap, map } from
 export class ProductService {
 
   private baseUrl = 'https://storerestservice.azurewebsites.net/api/products/';
-  products$: Observable<Product[]>;
+  products$: Observable<Product[]>
 
   constructor(
     private http: HttpClient
   ) {
-    this.initProducts();
+    this.initProducts()
+  }
+
+  getProductById(id: number): Observable<Product> {
+    return this
+            .products$
+            .pipe(
+              map(products => products.find(product => product.id == id))
+            )
   }
 
   initProducts() {
@@ -23,7 +31,8 @@ export class ProductService {
                       .get<Product[]>(this.baseUrl)
                       .pipe(
                         tap(console.table),
-                        delay(2000) // pour démo....
+                        delay(2000), // pour démo....
+                        shareReplay()
                       );
   }
 
