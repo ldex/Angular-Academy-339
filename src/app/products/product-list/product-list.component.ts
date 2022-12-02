@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { Product } from 'src/app/models/product.interface';
 import { ProductService } from 'src/app/services/product.service';
 
@@ -11,8 +11,34 @@ import { ProductService } from 'src/app/services/product.service';
 export class ProductListComponent implements OnInit, OnDestroy {
   title: string = 'Products';
   //products: Product[];
-  products$: Observable<Product[]> = this.productService.products$;
+  productsNb: number;
+  products$: Observable<Product[]> = this
+                                      .productService
+                                      .products$
+                                      .pipe(
+                                        tap(products => this.productsNb = products.length)
+                                      );
   selectedProduct: Product;
+
+  // Pagination
+  pageSize = 5;
+  start = 0;
+  end = this.pageSize;
+  pageNumber = 1;
+
+  previousPage() {
+    this.start -= this.pageSize;
+    this.end -= this.pageSize;
+    this.pageNumber--;
+    this.selectedProduct = null;
+  }
+
+  nextPage() {
+    this.start += this.pageSize;
+    this.end += this.pageSize;
+    this.pageNumber++;
+    this.selectedProduct = null;
+  }
 
   onSelect(product: Product) {
     this.selectedProduct = product;
